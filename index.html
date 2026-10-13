@@ -534,6 +534,16 @@ html[data-contrast="high"] .fdpage{background:#fff;color:#000}
 .tourseg button{justify-content:center;display:inline-flex;align-items:center;gap:6px}
 @media (max-width:960px){.tr-fab{right:14px;bottom:84px}}
 @media (prefers-reduced-motion:reduce){.tr-hole,.tr-tip{transition:none;animation:none}}
+.vplayer{display:grid;grid-template-columns:minmax(0,1fr) 270px;flex:1;min-height:0}
+.vmain{display:flex;flex-direction:column;min-width:0;background:#000}
+.vmain video{flex:1;min-height:0;width:100%;background:#000}
+.vbar{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--surface);border-top:1px solid var(--border)}
+.vch{list-style:none;margin:0;padding:8px;overflow:auto;border-left:1px solid var(--border);background:var(--surface-2);counter-reset:c}
+.vch button{display:flex;gap:10px;width:100%;text-align:left;border:0;background:none;padding:9px 10px;border-radius:8px;cursor:pointer;font:500 .85rem var(--font);color:var(--text)}
+.vch button:hover{background:var(--neutral-bg)}.vch button.on{background:var(--info-bg);color:var(--info);font-weight:700}
+.vch .mono{color:var(--faint);min-width:38px;padding-top:1px}
+.vbtn{color:var(--plum)}
+@media (max-width:900px){.vplayer{grid-template-columns:1fr;grid-template-rows:auto 1fr}.vch{border-left:0;border-top:1px solid var(--border);max-height:30vh}}
 </style>
 </head>
 <body>
@@ -613,6 +623,7 @@ contrast:'<circle cx="12" cy="12" r="9"/><path d="M12 3v18" /><path d="M12 3a9 9
 map:'<path d="m1 6 7-4 8 4 7-4v16l-7 4-8-4-7 4z"/><path d="M8 2v16M16 6v16"/>',
 layers:'<path d="m12 2 10 5-10 5L2 7z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/>',
 sign:'<path d="M3 21c3-1 5-4 6-7 1 3 3 4 5 2l2-2 1 3h4"/><path d="M14 4l4 4-7 7H7v-4z"/>',
+video:'<rect x="2" y="6" width="14" height="12" rx="2"/><path d="m16 10 6-4v12l-6-4z"/>',
 };
 const ic=(n,s=18,sw=1.8)=>`<svg class="ic" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n]||''}</svg>`;
 
@@ -856,6 +867,7 @@ function renderShell(){
    <span class="proto-tag">PROTOTYPE · DUMMY DATA</span>
    <div class="hsearch"><button data-act="cmdk">${ic('search',16)}<span class="t">${t('search')}</span><span class="kbd">Ctrl K</span></button></div>
    <select class="fy" aria-label="Financial year"><option>FY 2026-27</option><option>FY 2025-26</option><option>FY 2024-25</option></select>
+   <button class="icon-btn vbtn" data-act="video" aria-label="Watch walkthrough video" title="Watch the walkthrough video">${ic('video')}</button>
    <div style="position:relative"><button class="icon-btn" data-act="notif" aria-label="Notifications">${ic('bell')}<span class="dot"></span></button></div>
    <div style="position:relative"><button class="me" data-act="memenu" aria-haspopup="true">${av(ME.name)}<span><div class="n">${ME.name}</div><div class="d">ADC, Kamrup</div></span>${ic('chevd',14)}</button></div>
   </div><div class="grad-line"></div></header>
@@ -1562,7 +1574,7 @@ function pDag(arg){const [fid,dn]=arg.split('/'),f=fdOf(fid)||FORMD[0],d=dagOf(f
  ${dProc(d)?`<div class="banner" style="margin-top:12px">${ic('clock',16)}<span>A payment request of <b>${inr2(dProc(d))}</b> is awaiting approval. A new request can be raised after it is decided.</span></div>`:''}
  <div class="dag-grid">
   <div class="card"><div class="ch"><h2 class="ct">Pattadars (as per Form D)</h2><span class="xs faint">${d.pat.length} joint</span></div><div class="cb"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>Name</th><th>Relation</th><th>Paid to</th></tr></thead><tbody>${d.pat.map((p,i)=>{const got=sum(d.pays.filter(x=>x.payee===p.name),'amt');return `<tr><td class="mono small">${i+1}</td><td><div class="who">${av(p.name,'sm')}<div class="n small">${esc(p.name)}</div></div></td><td class="small">${p.rel} ${esc(p.g)}</td><td class="mono small">${got?inr2(got):'—'}</td></tr>`}).join('')}</tbody></table></div></div></div>
-  <div class="card"><div class="ch"><h2 class="ct">Award as per Form D</h2><span class="chip nod">Computed by department</span></div><div class="cb"><div class="calc">${[['(7) Land value @ '+inr(f.rate||0)+' / bigha',b.c7],['(8) Trees',b.c8],['(9) Total market value',b.c9],['(10) Market value × 1.2',b.c10],['(11) Houses / structures',b.c11],['(12) Total (10 + 11)',b.c12],['(13) Solatium 100%',b.c13],['(14) Additional amount',b.c14]].map(r=>`<div class="r row between" style="padding:6px 0;border-bottom:1px dashed var(--border)"><span class="small muted">${r[0]}</span><b class="mono small">${inr2(r[1])}</b></div>`).join('')}<div class="row between" style="padding:10px 0 0"><b>(15) Total award</b><b class="mono">${inr2(d.aw)}</b></div></div><div class="xs faint" style="margin-top:8px">Read-only, imported from the data sheet. eCMS does not recalculate compensation.</div></div></div></div>
+  <div class="card"><div class="ch"><h2 class="ct">Award as per Form D</h2><span class="chip nod">Computed by department</span></div><div class="cb"><div class="calc">${[['(7) Land value'+(f.rate?' @ '+inr(f.rate)+' / bigha':''),b.c7],['(8) Trees',b.c8],['(9) Total market value',b.c9],['(10) Market value × 1.2',b.c10],['(11) Houses / structures',b.c11],['(12) Total (10 + 11)',b.c12],['(13) Solatium 100%',b.c13],['(14) Additional amount',b.c14]].map(r=>`<div class="r row between" style="padding:6px 0;border-bottom:1px dashed var(--border)"><span class="small muted">${r[0]}</span><b class="mono small">${inr2(r[1])}</b></div>`).join('')}<div class="row between" style="padding:10px 0 0"><b>(15) Total award</b><b class="mono">${inr2(d.aw)}</b></div></div><div class="xs faint" style="margin-top:8px">Read-only, imported from the data sheet. eCMS does not recalculate compensation.</div></div></div></div>
  <div class="card" id="dagPays" style="margin-top:14px"><div class="ch"><h2 class="ct">Payments against this Dag</h2></div><div class="cb">${d.pays.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Date</th><th>Request</th><th>Payee</th><th>Bank</th><th class="num">Amount</th><th>ECR / Bill / UTR</th><th>Mode</th><th>Workflow</th><th>Status</th><th></th></tr></thead><tbody>${d.pays.map(p=>`<tr><td class="small nw">${dfmt(p.date)}</td><td class="mono small nw">${p.req}</td><td class="small"><b>${esc(p.payee)}</b>${p.listed?'':' <span class="chip warn nod">Not on Form D</span>'}<div class="xs faint">${esc(p.prel)}${p.reason?' · '+esc(p.reason):''}</div></td><td class="mono xs">${p.ifsc}<div class="faint">${p.ac}</div></td><td class="num mono"><b>${inr2(p.amt)}</b></td><td class="xs mono nw">ECR ${p.ecr}<div class="faint">${p.bill}${p.utr?'<br>'+p.utr:''}</div></td><td class="xs">${p.mode}</td><td class="mono small">${p.wf}</td><td>${chip(p.st)}</td><td>${payAct(f,d,p)}</td></tr>`).join('')}</tbody></table></div>`:`<div class="empty" style="padding:26px"><b>No payments yet</b><div class="small">Balance ${inr2(dBal(d))} is open for payment.</div></div>`}</div></div>${foot()}`}
 
 /* ---------- Initiate payment for a Dag (cross-referenced) ---------- */
@@ -2085,6 +2097,25 @@ document.addEventListener('keydown',e=>{if(TR.i<0||!$('#trTip'))return;if(['INPU
  if(e.key==='ArrowRight'){e.preventDefault();const n=$('#trTip [data-tr=next]');n?trGo(1):null}if(e.key==='ArrowLeft'&&TR.i>0){e.preventDefault();trGo(-1)}if(e.key==='Escape')trEnd()});
 setInterval(()=>{if(S.authed)trFab();else $('#trFab')&&$('#trFab').remove()},800);
 setTimeout(trAuto,900);
+
+/* =========================================================
+   WALKTHROUGH VIDEO — narrated screen-by-screen recording (video/eCMS-walkthrough.mp4)
+   Header button opens it; playback starts at the chapter for the current page.
+   ========================================================= */
+const VID_SRC='video/eCMS-walkthrough.mp4',VID_VTT='video/eCMS-walkthrough.vtt';
+const VCH=[['साइन इन',0.7,'login'],['टू-फ़ैक्टर वेरिफ़िकेशन',53.0,'otp'],['डैशबोर्ड',62.2,'dashboard'],['फ़ॉर्म डी रजिस्टर',91.1,'formd'],['नया फ़ॉर्म डी दर्ज करना',137.6,'formd-new'],['फ़ॉर्म डी की मंज़ूरी',262.4,'approvals'],['फ़ॉर्म डी केस',288.0,'formd/case'],['एक दाग का भुगतान',328.1,'dag-pay'],['दाग / पट्टा',393.9,'dag'],['कई दागों का भुगतान',405.8,'fd-pay'],['भुगतान की मंज़ूरी और क्रेडिट',448.3,'approvals'],['विवाद और कानूनी वारिस',484.7,'formd/case'],['पेमेंट्स',513.4,'payments'],['एलोकेशन बनाम पेड',525.3,'allocation'],['रिपोर्ट्स',533.3,'reports'],['विभाग',545.9,'departments'],['स्कीम और प्रोजेक्ट',558.6,'schemes scheme-new scheme-edit'],['अप्रूवल वर्कफ़्लो',574.0,'workflows'],['यूज़र मैनेजमेंट',589.4,'users user-new user-edit'],['रोल्स और अनुमतियाँ',602.9,'roles'],['गवर्नमेंट प्रोफ़ाइल',611.9,'govprofile profile']];
+const vClock=t=>`${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}`;
+function openVideo(){if(typeof trEnd==='function')trEnd();const k=trKey(trHash()),ci=Math.max(0,VCH.findIndex(c=>c[2].split(' ').includes(k)));
+ modal(`<div class="dh"><div><h3>${ic('video',18)} eCMS walkthrough</h3><div class="xs faint">हिन्दी में · हर काम सच में करके दिखाया गया · ${VCH.length} chapters · click a chapter to jump</div></div><button class="icon-btn" data-act="close" aria-label="Close">${ic('x')}</button></div>
+ <div class="vplayer"><div class="vmain"><video id="vid" controls playsinline preload="metadata"><source src="${VID_SRC}" type="video/mp4"><track kind="captions" src="${VID_VTT}" srclang="hi" label="हिन्दी" default></video>
+  <div class="vbar"><span class="small" id="vNow">अध्याय ${ci+1}: <b>${VCH[ci][0]}</b></span><span class="grow"></span>${ci?`<button class="btn sm" data-act="vseek" data-v="0">${ic('back',13)} शुरू से चलाएँ</button>`:''}</div></div>
+ <ol class="vch" id="vch">${VCH.map((c,i)=>`<li><button type="button" data-act="vseek" data-v="${i}" class="${i===ci?'on':''}"><span class="mono xs">${vClock(c[1])}</span><span>${c[0]}</span></button></li>`).join('')}</ol></div>`,'full');
+ const v=$('#vid');v.addEventListener('loadedmetadata',()=>{v.currentTime=VCH[ci][1];v.play().catch(()=>{})},{once:true});
+ v.addEventListener('error',()=>toast('Video file not found — keep the "video" folder next to this page','warn'),true);
+ v.addEventListener('timeupdate',()=>{let j=0;VCH.forEach((c,i)=>{if(v.currentTime>=c[1]-.5)j=i});const b=$$('#vch button');if(b[j]&&!b[j].classList.contains('on')){b.forEach((x,i)=>x.classList.toggle('on',i===j));b[j].scrollIntoView({block:'nearest'});$('#vNow').innerHTML=`अध्याय ${j+1}: <b>${VCH[j][0]}</b>`}})}
+document.addEventListener('click',e=>{const a=e.target.closest('[data-act]');if(!a)return;
+ if(a.dataset.act==='video')openVideo();
+ if(a.dataset.act==='vseek'){const v=$('#vid');if(v){v.currentTime=VCH[+a.dataset.v][1];v.play().catch(()=>{})}}});
 
 /* =========================================================
    ROUTER + ANIMATION
